@@ -125,7 +125,7 @@ module.exports = {
         .depth(0)
         .find()
 
-      if (null == jsonFiles)
+      if (null == jsonFiles || !jsonFiles.length)
         throw new Error(
           'Local JSON file names not found correctly - cannot run checks\n'
         )
@@ -135,11 +135,12 @@ module.exports = {
         process.cwd() + runPath + '/dist/',
         process.cwd() + runPath + '/src/',
       ].filter((path) => Fs.existsSync(path))
-
+      
       const stringFiles = await Filehound.create()
         .paths(process.cwd() + runPath, ...filePaths)
-        .discard(/.json/)
         .depth(0)
+        .not()
+        .ext('json')
         .find()
 
       // add specific git files for checks
@@ -150,7 +151,7 @@ module.exports = {
         stringFiles.push(process.cwd() + runPath + '/.gitignore')
       }
 
-      if (null == stringFiles || 0 == Object.keys(stringFiles))
+      if (null == stringFiles || !stringFiles.length)
         throw new Error(
           'Local file names (excl JSON) not found correctly - cannot run checks\n'
         )
@@ -161,11 +162,14 @@ module.exports = {
         let filePath = jsonFiles[j]
 
         let fileName = Path.basename(filePath)
-        let fileContent = require(filePath)
-        if (null == fileContent)
-          throw new Error('Problem reading ' + filename + ' file\n')
-
-        dataForChecks[fileName] = fileContent
+        let fileContent = null
+        try {
+          fileContent = require(filePath)
+          if (null == fileContent) { throw new Error('Problem reading ' + filename + ' file\n') }
+          dataForChecks[fileName] = fileContent
+        } catch (e) {
+          console.error(e)
+        }
 
         // to get package and main name from top-level package.json file
         if (process.cwd() + runPath + '/package.json' == filePath) {
@@ -306,10 +310,9 @@ module.exports = {
       ) {
         let file = checkDetails.file
         let jsonFile = checkDetails.jsonFile
-        let pass = file in dataForChecks
-        pass = jsonFile in dataForChecks
+        let pass = file in dataForChecks && jsonFile in dataForChecks
         let why = 'file__' + file + '__not__found'
-        if (true == pass) {
+        if (pass) {
           why = 'file__' + file + '__found'
 
           // getting jsonX
