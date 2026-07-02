@@ -18,6 +18,7 @@ Run the above command from your plugin's root directory to [install this tool](h
 
 Check out the official docs on dependencies and devDependencies [here](https://docs.npmjs.com/specifying-dependencies-and-devdependencies-in-a-package-json-file).
 
+
 ## Quick Example
 
 ```js
