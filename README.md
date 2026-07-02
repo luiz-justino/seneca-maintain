@@ -12,7 +12,9 @@
 
 ## Install
 
-`npm install -D @seneca/maintain`
+```sh
+npm install -D @seneca/maintain
+```
 
 Run the above command from your plugin's root directory to [install this tool](https://www.npmjs.com/package/@seneca/maintain). The `-D` flag (alternatively `--save-dev`) marks it as a _devDependency_ - meaning it is used during development and not as part of production.
 
